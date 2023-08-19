@@ -81,6 +81,10 @@ class TdjsonApi:
             result = json.loads(result.decode('utf-8'))
         return result
 
+    def SetProxy(self):
+        self._td_send({'@type': 'addProxy', 'server': '192.168.1.1', 'port': 8080, 'enable': True, 'type': {'@type': 'proxyTypeHttp'}})
+        self._td_send({'@type': 'getProxies'})
+
     def DoAuthorization(self):
         # start the client by sending a request to it
         self._td_send({'@type': 'getOption', 'name': 'version', '@extra': 1.01234})
@@ -151,5 +155,6 @@ class TdjsonApi:
 
 if __name__ == "__main__":
     tdjson = TdjsonApi()
+#    tdjson.SetProxy()
     tdjson.DoAuthorization()
     pass

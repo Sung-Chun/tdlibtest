@@ -163,10 +163,53 @@ class TdjsonApi:
 
         return True
 
+    def GetChats(self):
+        '''채팅방 ID와 제목 리스트를 획득한다.
+        '''
+        num_chats = 0
+        chat_info_list = []
+        print('\n☆☆☆☆☆   Sending getChats    ☆☆☆☆☆\n')
+        self._td_send({'@type': 'getChats', 'chat_list': None, 'limit': 2})
+        while True:
+            event = self._td_receive()
+            if event is None:
+                break
+            if event['@type'] == 'error':
+                print('\n\n  ERROR  ===========')
+                print(str(event).encode('utf-8'))
+                print('                ---------------')
+                return None
+            if event['@type'] == 'updateNewChat':
+                chat_title = event['chat']['title']
+                chat_id = event['chat']['id']
+                chat_info_list.append((chat_title, chat_id))
+                print('----------------------------------------------------------------------')
+                print(f'  ▶▶▶▶ 채팅방:  [{num_chats}] {chat_title},   (chat id: {chat_id})')
+                sys.stdout.flush()
+                num_chats += 1
+            elif event['@type'] == 'updateChatLastMessage':
+                chat_lastmessage_content = event['last_message']['content']
+                if chat_lastmessage_content['@type'] == 'messageText':
+                    message_text = event['last_message']['content']['text']['text']
+                    print(f'    ⊙M⊙  LAST MESSAGE: [{message_text}]')
+                elif chat_lastmessage_content['@type'] == 'messagePhoto':
+                    message_photo_caption = event['last_message']['content']['caption']['text']
+                    print(f'    ⊙P⊙  LAST PHOTO CAPTION : [{message_photo_caption}]')
+                elif chat_lastmessage_content['@type'] == 'messageContactRegistered':
+                    pass
+                elif chat_lastmessage_content['@type'] == 'messageChatAddMembers':
+                    pass
+                elif chat_lastmessage_content['@type'] == 'messageSupergroupChatCreate':
+                    pass
+                else:
+                    print(f'    ⊙ELSE⊙  Other : [{chat_lastmessage_content["@type"]}]')
+
+        return chat_info_list
 
 if __name__ == "__main__":
     tdjson = TdjsonApi()
 #    tdjson.SetProxy()
     if tdjson.DoAuthorization() is True:
         print('\n☆☆ Authorization Done ☆☆')
+        chat_info_list = tdjson.GetChats()
     pass

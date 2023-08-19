@@ -100,6 +100,9 @@ class TdjsonApi:
                     # if client is closed, we need to destroy it and create new client
                     if auth_state['@type'] == 'authorizationStateClosed':
                         break
+                    elif auth_state['@type'] == 'authorizationStateReady':
+                        break
+
 
                     # set TDLib parameters
                     # you MUST obtain your own api_id and api_hash at https://my.telegram.org
@@ -148,13 +151,22 @@ class TdjsonApi:
                         password = input('Please enter your password: ')
                         self._td_send({'@type': 'checkAuthenticationPassword', 'password': password})
 
-                if event['@type'] != 'updateOption':
                     # handle an incoming update or an answer to a previously sent request
-                    print(str(event).encode('utf-8'))
+                    print(event)
                     sys.stdout.flush()
+
+                # When error occurs, then return False
+                if event['@type'] == 'error':
+                    print(event)
+                    sys.stdout.flush()
+                    return False
+
+        return True
+
 
 if __name__ == "__main__":
     tdjson = TdjsonApi()
 #    tdjson.SetProxy()
-    tdjson.DoAuthorization()
+    if tdjson.DoAuthorization() is True:
+        print('\n☆☆ Authorization Done ☆☆')
     pass

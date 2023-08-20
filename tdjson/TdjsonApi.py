@@ -206,10 +206,37 @@ class TdjsonApi:
 
         return chat_info_list
 
+    def AddChatMember(self, chat_id, user_id, forward_limit=10):
+        '''채팅방에 멤버를 초대한다.
+
+        - chat_id: 채팅방 ID
+        - user_id: 회원 ID
+        - forward_limit: 초대한 회원에게 이전 메시지 몇개까지 보여줄 지 최대 100까지 설정
+                        (Ignored for supergroups and channels, or if the added user is a bot)
+        '''
+        print('\n☆☆☆☆☆   Adding new member to the chat    ☆☆☆☆☆\n')
+        self._td_send({'@type': 'addChatMember', 'chat_id': chat_id, 'user_id': user_id, 'forward_limit': forward_limit})
+        while True:
+            event = self._td_receive()
+            if event is None:
+                break
+            if event['@type'] == 'error':
+                print('\n\n  ERROR  ===========')
+                print(event)
+                print('    ---------------')
+                return None
+
+            print(event)
+
+
 if __name__ == "__main__":
     tdjson = TdjsonApi()
 #    tdjson.SetProxy()
     if tdjson.DoAuthorization() is True:
         print('\n☆☆ Authorization Done ☆☆')
         chat_info_list = tdjson.GetChats()
+        if chat_info_list is not None:
+            if len(chat_info_list) > 0:
+                # 첫번째 방에 user_id=0인 회원을 초대한다. user_id=0인 회원은 없으므로 Error가 발생한다.
+                tdjson.AddChatMember(chat_info_list[0][1], 0)
     pass

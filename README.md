@@ -43,7 +43,15 @@ if auth_state['@type'] == 'authorizationStateWaitTdlibParameters' 부분을 보�
 회원가입이 된 회원의 경우, 최초 로그인은 위 1번 인증 과정에서 폰 번호와 인증번호를 입력하여 로그인이 완료되기 때문에 별도 구현을 하지 않았다.
 최초 로그인을 하면 로그인 정보는 db에 저장이 되므로 다음 번 인증을 위한 DoAuthorization() 함수 호출 시 별도로 입력되는 절차는 없다.
 
-봇 로그인은 폰 번호 대신 사전에 발급한 봇 토큰이 필요한데, 이 부분은 추가 예정이다.
+봇 로그인은 폰 번호 대신 사전에 발급한 봇 토큰을 입력하면 되는데, 아래 예시와 같이 봇 토큰을 입력할 수 있고 만료된 봇 토큰을 넣어서 ACCESS_TOKEN_EXPIRED 오류가 발생하는 것을 확인할 수 있다.
+```
+d:\WORK> python tdjson\TdjsonApi.py
+b"{'@type': 'ok', '@extra': 1.01234}"
+{'@type': 'updateAuthorizationState', 'authorization_state': {'@type': 'authorizationStateWaitTdlibParameters'}, '@client_id': 1}
+전화번호 또는 봇 토큰을 입력하세요: 802131984:AAHH6QL4TmvYwaUhgZheTNg9vteSVzeTKPQ
+{'@type': 'updateAuthorizationState', 'authorization_state': {'@type': 'authorizationStateWaitPhoneNumber'}, '@client_id': 1}
+{'@type': 'error', 'code': 400, 'message': 'ACCESS_TOKEN_EXPIRED', '@client_id': 1}
+```
 
 **4. 프록시 설정: SetProxy()**
 

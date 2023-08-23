@@ -121,8 +121,16 @@ class TdjsonApi:
 
                     # enter phone number to log in
                     if auth_state['@type'] == 'authorizationStateWaitPhoneNumber':
-                        phone_number = input('Please enter your phone number: ')
-                        self._td_send({'@type': 'setAuthenticationPhoneNumber', 'phone_number': phone_number})
+                        phone_or_token = input('전화번호 또는 봇 토큰을 입력하세요: ')
+                        if len(phone_or_token) < 10:
+                            print(f'잘못 입력하셨습니다.')
+                            return False
+                        elif len(phone_or_token) < 20:
+                            self._td_send({'@type': 'setAuthenticationPhoneNumber', 'phone_number': phone_or_token})
+                        else:
+                            if phone_or_token[:3] == 'bot':
+                                phone_or_token = phone_or_token[3:]
+                            self._td_send({'@type': 'checkAuthenticationBotToken', 'token': phone_or_token})
 
                     # enter email address to log in
                     if auth_state['@type'] == 'authorizationStateWaitEmailAddress':
